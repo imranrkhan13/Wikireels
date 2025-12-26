@@ -169,21 +169,7 @@ const ReelCard = ({ article, isActive, totalCards, currentIndex }) => {
         className="w-full max-w-[95%] sm:max-w-2xl h-full max-h-[92vh] sm:max-h-[88vh] relative"
         style={{ perspective: '1000px' }}>
 
-        {/* Progress indicator */}
-        {isActive && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute -top-6 sm:-top-10 left-0 right-0 flex items-center justify-center gap-1 sm:gap-1.5 z-50">
-            {Array.from({ length: Math.min(totalCards, 10) }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-0.5 sm:h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-6 sm:w-8 bg-white' : 'w-0.5 sm:w-1 bg-white/30'
-                  }`}
-              />
-            ))}
-          </motion.div>
-        )}
+
 
         <motion.div
           whileHover={{ scale: isActive ? 1.02 : 1 }}
