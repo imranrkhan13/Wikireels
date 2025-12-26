@@ -7,7 +7,6 @@ A modern, TikTok-style vertical scrolling interface for discovering fascinating 
 - **Vertical Scroll Experience** - Smooth snap-scrolling through Wikipedia articles, just like social media reels
 - **Niche Topics** - Automatically fetches articles about forgotten medieval weapons, mysterious archaeological finds, rare phenomena, and other fascinating obscure subjects
 - **Progressive Loading** - Infinite scroll with automatic content loading as you browse
-- **Progress Indicators** - Visual dots showing your position in the current feed
 - **Responsive Design** - Fully optimized for mobile, tablet, and desktop screens
 - **Interactive Animations** - Smooth transitions, floating elements, and subtle background effects
 - **Direct Links** - Quick access to read the full Wikipedia article
