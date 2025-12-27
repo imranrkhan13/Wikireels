@@ -11,6 +11,12 @@ A modern, TikTok-style vertical scrolling interface for discovering fascinating 
 - **Interactive Animations** - Smooth transitions, floating elements, and subtle background effects
 - **Direct Links** - Quick access to read the full Wikipedia article
 - **No Duplicates** - Smart tracking ensures you don't see the same article twice
+- **Save** - Bookmark articles you love
+- **Share** - Easily share articles
+- **My Bookmarks** - All your bookmarks in one place
+- **Customize UI** - Change the app’s color theme
+
+
 
 ## Tech Stack
 
