@@ -6,11 +6,16 @@
       font-family: "Poppins", sans-serif;
 
 }
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
+/* tailwind plugin or global css */
+.scroll-smooth {
+    scroll-behavior: smooth;
 }
 
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
 }
