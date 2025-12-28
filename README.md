@@ -30,6 +30,7 @@ A modern, TikTok-style vertical scrolling interface for discovering fascinating 
 
 The app queries Wikipedia for interesting niche topics, retrieves summaries, and displays them in an elegant card-based interface. Each card features:
 - Article title and summary (300-400 words)
+- Article image beside the summary
 - Beautiful dark-themed design with subtle color variations
 - Floating decorative elements for visual depth
 - One-tap access to the full Wikipedia article
