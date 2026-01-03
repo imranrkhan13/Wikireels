@@ -162,7 +162,7 @@ const ReelCard = ({ article, isActive, totalCards, currentIndex, onSave, isSaved
           duration: 0.5,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="w-full sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[70%] 2xl:w-[65%] max-w-5xl h-[88vh] sm:h-[90vh] md:h-[92vh] relative">
+        className="w-full sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[70%] max-w-5xl h-auto min-h-[80vh] flex flex-col">
 
         <div
           className="w-full h-full rounded-2xl sm:rounded-3xl flex flex-col relative overflow-hidden"
@@ -955,7 +955,7 @@ const ReelFeed = () => {
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
               style={{ color: theme.accent }}>
-              Be ready to drown in information...
+              Your scroll just got smart
             </motion.p>
           </div>
         )}
