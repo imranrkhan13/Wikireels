@@ -639,7 +639,7 @@ const ReelFeed = () => {
                           }}>
                           {t.badge === "Default" && <Sparkles className="w-2.5 sm:w-3 h-2.5 sm:h-3" />}
                           {t.badge === "Most Used" && <TrendingUp className="w-2.5 sm:w-3 h-2.5 sm:h-3" />}
-                          <span className="hidden xs:inline">{t.badge}</span>
+                          <span className="hidden sm:inline">{t.badge}</span>
                         </motion.div>
                       )}
 
