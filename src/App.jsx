@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Loader2, Bookmark, Share2, Palette, Sparkles, Crown, X } from 'lucide-react';
 
-// Enhanced color palette with 15+ sophisticated themes
 const COLOR_THEMES = [
   { name: "Warm Cream", bg: ["#F5F1E8", "#F7F3EA", "#F3EFE6", "#F8F4EB", "#F6F2E9"], text: ["#3E3E3E", "#424242", "#404040", "#3C3C3C", "#3A3A3A"], accent: "#8B5C4A", gradient: ["#EDE7DC", "#E3DCD0"], isDefault: true },
   { name: "MIT Whisper", bg: ["#F1F8F6", "#F3FAF8", "#F0F7F5", "#F4FBF9", "#F2F9F7"], text: ["#2D3F38", "#2F4139", "#2E4038", "#2C3E37", "#2B3D36"], accent: "#4A8B7F", gradient: ["#E5F1ED", "#D9E8E3"], isPopular: true },
@@ -90,7 +89,7 @@ const fetchWikipediaArticles = async (usedTitles) => {
 
 const AnimatedButton = ({ onClick, icon: Icon, isFilled = false, label, className = "", style = {} }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <motion.button
       onClick={onClick}
@@ -101,14 +100,13 @@ const AnimatedButton = ({ onClick, icon: Icon, isFilled = false, label, classNam
       className={`relative p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl shadow-lg transition-all overflow-hidden ${className}`}
       style={style}
     >
-      {/* Animated background glow */}
       <motion.div
         className="absolute inset-0"
         animate={isHovered ? { opacity: 0.3 } : { opacity: 0 }}
         transition={{ duration: 0.3 }}
         style={{ backgroundColor: 'white', borderRadius: 'inherit' }}
       />
-      
+
       <div className="relative z-10 flex items-center gap-2">
         <motion.div
           animate={isHovered ? { rotate: 360, scale: 1.1 } : { rotate: 0, scale: 1 }}
@@ -148,169 +146,57 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
   const start = index * vh;
   const end = (index + 1) * vh;
 
-  const y = useTransform(
-    scrollProgress,
-    [start - vh, start, end, end + vh],
-    [vh, 0, 0, -vh]
-  );
-
-  const scale = useTransform(
-    scrollProgress,
-    [start - vh, start, end, end + vh],
-    [0.93, 1, 1, 0.93]
-  );
-
-  const opacity = useTransform(
-    scrollProgress,
-    [start - vh, start, end, end + vh],
-    [0, 1, 1, 0]
-  );
+  const y = useTransform(scrollProgress, [start - vh, start, end, end + vh], [vh, 0, 0, -vh]);
+  const scale = useTransform(scrollProgress, [start - vh, start, end, end + vh], [0.93, 1, 1, 0.93]);
+  const opacity = useTransform(scrollProgress, [start - vh, start, end, end + vh], [0, 1, 1, 0]);
 
   const handleShare = async (method) => {
-    const shareData = {
-      title: article.title,
-      text: `Check out this article: ${article.title}`,
-      url: article.url
-    };
-
+    const shareData = { title: article.title, text: `Check out: ${article.title}`, url: article.url };
     if (method === 'native' && navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.log('Share cancelled');
-      }
+      try { await navigator.share(shareData); } catch (err) { console.log('Share cancelled'); }
     } else if (method === 'copy') {
-      try {
-        await navigator.clipboard.writeText(article.url);
-        alert('Link copied to clipboard!');
-      } catch (err) {
-        console.error('Failed to copy');
-      }
+      try { await navigator.clipboard.writeText(article.url); alert('Link copied!'); } catch (err) { console.error('Failed'); }
     }
     setShowShareMenu(false);
   };
 
   return (
     <motion.div
-      style={{
-        y,
-        scale,
-        opacity,
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 10,
-        fontFamily: "'Inter', sans-serif",
-        pointerEvents: "none",
-        willChange: "transform, opacity"
-      }}
-      className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8">
-
+      style={{ y, scale, opacity, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, fontFamily: "'Inter', sans-serif", pointerEvents: "none", willChange: "transform, opacity" }}
+      className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8"
+    >
       <div className="w-full max-w-4xl h-[90vh] pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          whileHover={{ y: -10 }} // Card lifts on hover
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-auto"
-          style={{
-            backgroundColor: bgColor,
-            boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`,
-          }}>
-
-          {/* Animated Background Decoration */}
+          className="w-full h-full rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-auto" // pointer-events-auto here for hover
+          style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15` }}
+        >
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 90, 0],
-                opacity: [0.03, 0.05, 0.03],
-              }}
-              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-1/4 -right-1/4 w-full h-full rounded-full blur-3xl"
-              style={{ backgroundColor: accentColor }}
-            />
-            <motion.div
-              animate={{
-                scale: [1.2, 1, 1.2],
-                rotate: [90, 0, 90],
-                opacity: [0.02, 0.04, 0.02],
-              }}
-              transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-1/4 -left-1/4 w-full h-full rounded-full blur-3xl"
-              style={{ backgroundColor: accentColor }}
-            />
+            <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], opacity: [0.03, 0.05, 0.03] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-1/4 -right-1/4 w-full h-full rounded-full blur-3xl" style={{ backgroundColor: accentColor }} />
+            <motion.div animate={{ scale: [1.2, 1, 1.2], rotate: [90, 0, 90], opacity: [0.02, 0.04, 0.02] }} transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }} className="absolute -bottom-1/4 -left-1/4 w-full h-full rounded-full blur-3xl" style={{ backgroundColor: accentColor }} />
           </div>
 
-          {/* Fixed Header */}
           <div className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pb-3 sm:pb-4">
             <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3"
-                  style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  </motion.div>
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3" style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
+                  <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}><Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></motion.div>
                   Wikipedia Discovery
                 </motion.div>
-                <motion.h2 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight tracking-tight"
-                  style={{ color: textColor }}>
-                  {article.title}
-                </motion.h2>
+                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
               </div>
-
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-                <AnimatedButton
-                  onClick={() => onSave(article.id)}
-                  icon={Bookmark}
-                  isFilled={isSaved}
-                  style={{
-                    backgroundColor: isSaved ? accentColor : `${accentColor}12`,
-                    color: isSaved ? '#FFFFFF' : accentColor
-                  }}
-                />
-
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+                <AnimatedButton onClick={() => onSave(article.id)} icon={Bookmark} isFilled={isSaved} style={{ backgroundColor: isSaved ? accentColor : `${accentColor}12`, color: isSaved ? '#FFFFFF' : accentColor }} />
                 <div className="relative">
-                  <AnimatedButton
-                    onClick={() => setShowShareMenu(!showShareMenu)}
-                    icon={Share2}
-                    style={{
-                      backgroundColor: `${accentColor}12`,
-                      color: accentColor
-                    }}
-                  />
-
+                  <AnimatedButton onClick={() => setShowShareMenu(!showShareMenu)} icon={Share2} style={{ backgroundColor: `${accentColor}12`, color: accentColor }} />
                   <AnimatePresence>
                     {showShareMenu && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.85, y: 5 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.85, y: 5 }}
-                        transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                        className="absolute right-0 mt-2 w-44 sm:w-48 rounded-2xl shadow-2xl overflow-hidden z-50 border"
-                        style={{ backgroundColor: bgColor, borderColor: `${accentColor}15` }}>
-                        <button onClick={() => handleShare('native')} className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-black/5 flex items-center gap-2.5 transition-colors" style={{ color: textColor }}>
-                          <Share2 className="w-4 h-4" /> Share
-                        </button>
-                        <button onClick={() => handleShare('copy')} className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-black/5 flex items-center gap-2.5 transition-colors" style={{ color: textColor }}>
-                          <ExternalLink className="w-4 h-4" /> Copy Link
-                        </button>
+                      <motion.div initial={{ opacity: 0, scale: 0.85, y: 5 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 5 }} transition={{ type: "spring", damping: 20, stiffness: 300 }} className="absolute right-0 mt-2 w-44 sm:w-48 rounded-2xl shadow-2xl overflow-hidden z-50 border" style={{ backgroundColor: bgColor, borderColor: `${accentColor}15` }}>
+                        <button onClick={() => handleShare('native')} className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-black/5 flex items-center gap-2.5 transition-colors" style={{ color: textColor }}><Share2 className="w-4 h-4" /> Share</button>
+                        <button onClick={() => handleShare('copy')} className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-black/5 flex items-center gap-2.5 transition-colors" style={{ color: textColor }}><ExternalLink className="w-4 h-4" /> Copy Link</button>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -319,72 +205,27 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </div>
           </div>
 
-          {/* Scrollable Content */}
-          <div
-            ref={contentScrollRef}
-            className="flex-1 overflow-y-auto px-5 sm:px-6 md:px-8 lg:px-10 custom-scrollbar relative z-10"
-            style={{ WebkitOverflowScrolling: 'touch' }}>
-
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="pb-6">
+          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-5 sm:px-6 md:px-8 lg:px-10 custom-scrollbar relative z-10" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
-                <motion.div 
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="w-full sm:w-3/5 md:w-2/5 lg:w-1/3 float-right ml-0 sm:ml-5 md:ml-6 mb-4 md:mb-5">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-2/5 sm:w-3/5 md:w-2/5 lg:w-1/3 float-right ml-4 sm:ml-5 md:ml-6 mb-2 sm:mb-4 md:mb-5">
                   <div className="relative aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border select-none" style={{ borderColor: `${accentColor}10` }}>
                     {!imageLoaded && <div className="absolute inset-0 bg-black/5 animate-pulse flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin opacity-20" /></div>}
-                    <img
-                      src={article.imageUrl}
-                      alt={article.title}
-                      onLoad={() => setImageLoaded(true)}
-                      className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                      draggable="false"
-                    />
+                    <img src={article.imageUrl} alt={article.title} onLoad={() => setImageLoaded(true)} className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} draggable="false" />
                   </div>
                 </motion.div>
               )}
-
               <div className="select-text">
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="text-sm sm:text-base md:text-lg leading-relaxed font-normal opacity-90"
-                  style={{ color: textColor }}>
-                  {article.summary}
-                </motion.p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="text-sm sm:text-base md:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor }}>{article.summary}</motion.p>
               </div>
-
               <div className="clear-both"></div>
             </motion.div>
           </div>
 
-          {/* Fixed Footer */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pt-3 sm:pt-4 border-t" 
-            style={{ borderColor: `${accentColor}10` }}>
-            <motion.a
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ x: 8, scale: 1.02 }}
-              className="inline-flex items-center gap-2.5 text-sm sm:text-base font-bold group"
-              style={{ color: accentColor }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pt-3 sm:pt-4 border-t" style={{ borderColor: `${accentColor}10` }}>
+            <motion.a href={article.url} target="_blank" rel="noopener noreferrer" whileHover={{ x: 8, scale: 1.02 }} className="inline-flex items-center gap-2.5 text-sm sm:text-base font-bold group" style={{ color: accentColor }}>
               Read full article on Wikipedia
-              <motion.div
-                whileHover={{ x: 3, y: -3 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                <ExternalLink className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
-              </motion.div>
+              <motion.div whileHover={{ x: 3, y: -3 }} transition={{ type: "spring", stiffness: 400 }}><ExternalLink className="w-4.5 h-4.5 sm:w-5 sm:h-5" /></motion.div>
             </motion.a>
           </motion.div>
         </motion.div>
@@ -405,7 +246,6 @@ const ReelFeed = () => {
 
   const theme = COLOR_THEMES[currentTheme];
   const { scrollY } = useScroll({ container: containerRef });
-  const scrollProgress = scrollY;
 
   const loadArticles = async () => {
     if (loadingMore) return;
@@ -415,21 +255,15 @@ const ReelFeed = () => {
     setLoadingMore(false);
   };
 
-  useEffect(() => {
-    loadArticles();
-  }, []);
+  useEffect(() => { loadArticles(); }, []);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
-      if (scrollTop + clientHeight >= scrollHeight - 1000 && !loadingMore) {
-        loadArticles();
-      }
+      if (scrollTop + clientHeight >= scrollHeight - 1000 && !loadingMore) loadArticles();
     };
-
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, [loadingMore, articles.length]);
@@ -443,172 +277,46 @@ const ReelFeed = () => {
     });
   };
 
-  const savedArticlesList = useMemo(() =>
-    articles.filter(a => savedArticles.has(a.id)),
-    [articles, savedArticles]
-  );
+  const scrollToArticle = (id) => {
+    const index = articles.findIndex(a => a.id === id);
+    if (index !== -1 && containerRef.current) {
+      const vh = window.innerHeight;
+      containerRef.current.scrollTo({
+        top: index * vh,
+        behavior: 'smooth'
+      });
+      setShowSaved(false);
+    }
+  };
+
+  const savedArticlesList = useMemo(() => articles.filter(a => savedArticles.has(a.id)), [articles, savedArticles]);
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ backgroundColor: theme.gradient[0], fontFamily: "'Inter', sans-serif" }}>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-          background: rgba(0,0,0,0.12); 
-          border-radius: 10px; 
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
-          background: rgba(0,0,0,0.2); 
-        }
-        .custom-scrollbar { 
-          scrollbar-width: thin; 
-          scrollbar-color: rgba(0,0,0,0.12) transparent; 
-        }
-        
-        .select-text {
-          user-select: text;
-          -webkit-user-select: text;
-        }
-        
-        .select-none {
-          user-select: none;
-          -webkit-user-select: none;
-        }
-        
-        * {
-          -webkit-tap-highlight-color: transparent;
-        }
-      `}} />
+      <style dangerouslySetInnerHTML={{ __html: `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');.custom-scrollbar::-webkit-scrollbar{width:8px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:10px}.custom-scrollbar::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.2)}.custom-scrollbar{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.12) transparent}.select-text{user-select:text;-webkit-user-select:text}.select-none{user-select:none;-webkit-user-select:none}*{-webkit-tap-highlight-color:transparent}.snap-container{scroll-snap-type:y mandatory;scroll-behavior:smooth}.snap-item{scroll-snap-align:start;scroll-snap-stop:always}` }} />
 
-      {/* Theme Modal */}
       <AnimatePresence>
         {showThemes && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md"
-            onClick={() => setShowThemes(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col"
-              style={{ backgroundColor: theme.bg[0] }}
-            >
-              {/* Header */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md" onClick={() => setShowThemes(false)}>
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col" style={{ backgroundColor: theme.bg[0] }}>
               <div className="flex-shrink-0 p-6 sm:p-8 border-b" style={{ borderColor: `${theme.accent}10` }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <motion.h2 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-2xl sm:text-3xl font-bold mb-1" 
-                      style={{ color: theme.text[0] }}>
-                      Color Themes
-                    </motion.h2>
-                    <motion.p 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="text-sm opacity-60" 
-                      style={{ color: theme.text[0] }}>
-                      Default: Warm Cream
-                    </motion.p>
+                    <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: theme.text[0] }}>Color Themes</motion.h2>
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-sm opacity-60" style={{ color: theme.text[0] }}>Default: Warm Cream</motion.p>
                   </div>
-                  <motion.button
-                    onClick={() => setShowThemes(false)}
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-3 rounded-full hover:bg-black/5 transition-colors"
-                    style={{ color: theme.accent }}
-                  >
-                    <X className="w-6 h-6" />
-                  </motion.button>
+                  <motion.button onClick={() => setShowThemes(false)} whileHover={{ rotate: 90, scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-3 rounded-full hover:bg-black/5 transition-colors" style={{ color: theme.accent }}><X className="w-6 h-6" /></motion.button>
                 </div>
               </div>
-
-              {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {COLOR_THEMES.map((t, idx) => (
-                    <motion.button
-                      key={t.name}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      onClick={() => {
-                        setCurrentTheme(idx);
-                        setTimeout(() => setShowThemes(false), 200);
-                      }}
-                      whileHover={{ scale: 1.03, y: -4 }}
-                      whileTap={{ scale: 0.97 }}
-                      className="p-5 rounded-2xl text-left transition-all relative overflow-hidden group"
-                      style={{
-                        backgroundColor: t.bg[0],
-                        border: currentTheme === idx ? `2px solid ${t.accent}` : '2px solid transparent',
-                        boxShadow: currentTheme === idx ? `0 8px 24px ${t.accent}25` : '0 2px 8px rgba(0,0,0,0.05)',
-                      }}
-                    >
-                      {/* Popular Badge */}
-                      {t.isPopular && (
-                        <motion.div
-                          initial={{ scale: 0, rotate: -45 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{ type: "spring", damping: 15 }}
-                          className="absolute top-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-md"
-                        >
-                          <Crown className="w-3 h-3" />
-                          Popular
-                        </motion.div>
-                      )}
-
-                      {/* Default Badge */}
-                      {t.isDefault && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute top-2.5 right-2.5 text-white px-2.5 py-1 rounded-full text-[10px] font-bold shadow-md" 
-                          style={{ backgroundColor: t.accent }}
-                        >
-                          Default
-                        </motion.div>
-                      )}
-
-                      {/* Color Swatches */}
-                      <div className="flex gap-2 mb-3">
-                        {t.bg.slice(0, 4).map((c, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ delay: idx * 0.05 + i * 0.05, type: "spring" }}
-                            className="w-6 h-6 rounded-lg shadow-sm"
-                            style={{ backgroundColor: c }}
-                          />
-                        ))}
-                      </div>
-
-                      <p className="font-bold text-base mb-0.5" style={{ color: t.text[0] }}>
-                        {t.name}
-                      </p>
-                      
-                      {currentTheme === idx && (
-                        <motion.p 
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs opacity-60 mt-1" 
-                          style={{ color: t.text[0] }}
-                        >
-                          ✓ Active
-                        </motion.p>
-                      )}
+                    <motion.button key={t.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} onClick={() => { setCurrentTheme(idx); setTimeout(() => setShowThemes(false), 200); }} whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }} className="p-5 rounded-2xl text-left transition-all relative overflow-hidden group" style={{ backgroundColor: t.bg[0], border: currentTheme === idx ? `2px solid ${t.accent}` : '2px solid transparent', boxShadow: currentTheme === idx ? `0 8px 24px ${t.accent}25` : '0 2px 8px rgba(0,0,0,0.05)' }}>
+                      {t.isPopular && <motion.div initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 15 }} className="absolute top-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-md"><Crown className="w-3 h-3" />Popular</motion.div>}
+                      {t.isDefault && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2.5 right-2.5 text-white px-2.5 py-1 rounded-full text-[10px] font-bold shadow-md" style={{ backgroundColor: t.accent }}>Default</motion.div>}
+                      <div className="flex gap-2 mb-3">{t.bg.slice(0, 4).map((c, i) => <motion.div key={i} initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: idx * 0.05 + i * 0.05, type: "spring" }} className="w-6 h-6 rounded-lg shadow-sm" style={{ backgroundColor: c }} />)}</div>
+                      <p className="font-bold text-base mb-0.5" style={{ color: t.text[0] }}>{t.name}</p>
+                      {currentTheme === idx && <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-xs opacity-60 mt-1" style={{ color: t.text[0] }}>✓ Active</motion.p>}
                     </motion.button>
                   ))}
                 </div>
@@ -618,101 +326,69 @@ const ReelFeed = () => {
         )}
       </AnimatePresence>
 
-      {/* Saved Modal */}
       <AnimatePresence>
         {showSaved && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md"
-            onClick={() => setShowSaved(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col"
-              style={{ backgroundColor: theme.bg[0] }}
-            >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md" onClick={() => setShowSaved(false)}>
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col" style={{ backgroundColor: theme.bg[0] }}>
               <div className="flex-shrink-0 p-6 sm:p-8 border-b" style={{ borderColor: `${theme.accent}10` }}>
                 <div className="flex items-center justify-between">
-                  <motion.h2 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="text-2xl sm:text-3xl font-bold" 
-                    style={{ color: theme.text[0] }}
-                  >
-                    Saved Articles ({savedArticlesList.length})
-                  </motion.h2>
-                  <motion.button
-                    onClick={() => setShowSaved(false)}
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-3 rounded-full hover:bg-black/5 transition-colors"
-                    style={{ color: theme.accent }}
-                  >
-                    <X className="w-6 h-6" />
-                  </motion.button>
+                  <div>
+                    <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: theme.text[0] }}>Saved Articles</motion.h2>
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-sm opacity-60" style={{ color: theme.text[0] }}>{savedArticlesList.length} {savedArticlesList.length === 1 ? 'article' : 'articles'} saved</motion.p>
+                  </div>
+                  <motion.button onClick={() => setShowSaved(false)} whileHover={{ rotate: 90, scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-3 rounded-full hover:bg-black/5 transition-colors" style={{ color: theme.accent }}><X className="w-6 h-6" /></motion.button>
                 </div>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-3 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
                 {savedArticlesList.length === 0 ? (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-16"
-                  >
-                    <motion.div
-                      animate={{ 
-                        y: [0, -10, 0],
-                        rotate: [0, 5, -5, 0]
-                      }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <Bookmark className="w-16 h-16 mx-auto mb-4 opacity-20" style={{ color: theme.accent }} />
-                    </motion.div>
-                    <p className="text-lg opacity-60" style={{ color: theme.text[0] }}>No saved articles yet</p>
-                    <p className="text-sm opacity-40 mt-2" style={{ color: theme.text[0] }}>Tap the bookmark icon to save articles</p>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 15 }} className="inline-flex p-6 rounded-full mb-4" style={{ backgroundColor: `${theme.accent}12` }}><Bookmark className="w-12 h-12 opacity-30" style={{ color: theme.accent }} /></motion.div>
+                    <p className="text-lg font-semibold mb-2" style={{ color: theme.text[0] }}>No saved articles yet</p>
+                    <p className="text-sm opacity-60" style={{ color: theme.text[0] }}>Bookmark articles to read them later</p>
                   </motion.div>
                 ) : (
-                  savedArticlesList.map((article, idx) => (
-                    <motion.div
-                      key={article.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      whileHover={{ x: 8, scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="p-5 rounded-2xl cursor-pointer transition-colors relative overflow-hidden group"
-                      style={{ backgroundColor: `${theme.accent}08` }}
-                      onClick={() => {
-                        setShowSaved(false);
-                        const index = articles.findIndex(a => a.id === article.id);
-                        if (index !== -1) {
-                          containerRef.current.scrollTo({ top: index * window.innerHeight, behavior: 'smooth' });
-                        }
-                      }}
-                    >
-                      {/* Hover effect */}
+                  <div className="space-y-3">
+                    {savedArticlesList.map((article, idx) => (
                       <motion.div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ backgroundColor: `${theme.accent}05` }}
-                      />
-                      
-                      <div className="relative z-10">
-                        <h3 className="font-bold mb-2 text-base" style={{ color: theme.text[0] }}>
-                          {article.title}
-                        </h3>
-                        <p className="text-sm opacity-70 line-clamp-2" style={{ color: theme.text[0] }}>
-                          {article.summary}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))
+                        key={article.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="p-5 rounded-2xl hover:shadow-lg transition-all group cursor-pointer"
+                        style={{ backgroundColor: theme.bg[1], border: `1px solid ${theme.accent}10` }}
+                        onClick={() => scrollToArticle(article.id)}
+                      >
+                        <div className="flex items-start gap-4">
+                          {article.imageUrl && (
+                            <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden" style={{ border: `1px solid ${theme.accent}10` }}>
+                              <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-base sm:text-lg mb-1 line-clamp-1" style={{ color: theme.text[0] }}>{article.title}</h3>
+                            <p className="text-xs sm:text-sm opacity-60 line-clamp-2 mb-3" style={{ color: theme.text[0] }}>{article.summary}</p>
+                            <div className="flex items-center gap-3">
+                              <span className="inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: theme.accent }}>
+                                View in Feed
+                              </span>
+                              <motion.button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSave(article.id);
+                                }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-1.5 rounded-lg hover:bg-black/5 transition-colors"
+                                style={{ color: theme.accent }}
+                              >
+                                <Bookmark className="w-4 h-4" fill="currentColor" />
+                              </motion.button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 )}
               </div>
             </motion.div>
@@ -720,116 +396,55 @@ const ReelFeed = () => {
         )}
       </AnimatePresence>
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 sm:bottom-8 left-6 sm:left-8 right-6 sm:right-8 flex justify-between items-center z-[60] pointer-events-none">
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", damping: 15, delay: 0.2 }}
-        >
+      {/* Header - Hidden on mobile, shown on sm+ */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="fixed top-0 left-0 right-0 z-50 p-4 sm:p-6 pointer-events-none hidden sm:block">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl shadow-xl pointer-events-auto" style={{ backgroundColor: theme.bg[0], border: `1px solid ${theme.accent}15` }}>
+            <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}><Sparkles className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: theme.accent }} /></motion.div>
+            <span className="font-bold text-base sm:text-lg tracking-tight" style={{ color: theme.text[0] }}>WikiScroll</span>
+          </motion.div>
+          <div className="flex items-center gap-2 sm:gap-2.5 pointer-events-auto">
+            <AnimatedButton onClick={() => setShowSaved(true)} icon={Bookmark} isFilled={savedArticlesList.length > 0} label={savedArticlesList.length > 0 ? `${savedArticlesList.length}` : undefined} style={{ backgroundColor: savedArticlesList.length > 0 ? theme.accent : `${theme.accent}12`, color: savedArticlesList.length > 0 ? '#FFFFFF' : theme.accent }} />
+            <AnimatedButton onClick={() => setShowThemes(true)} icon={Palette} style={{ backgroundColor: `${theme.accent}12`, color: theme.accent }} />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Mobile-only floating buttons */}
+      <div className="sm:hidden fixed bottom-6 left-6 right-6 z-[60] flex justify-between pointer-events-none">
+        <div className="pointer-events-auto">
           <AnimatedButton
             onClick={() => setShowThemes(true)}
             icon={Palette}
-            style={{ backgroundColor: theme.accent, color: '#FFF' }}
-            className="pointer-events-auto shadow-xl"
+            style={{ backgroundColor: theme.bg[0], color: theme.accent, border: `1px solid ${theme.accent}20` }}
           />
-        </motion.div>
-        
-        <AnimatePresence>
-          {savedArticles.size > 0 && (
-            <motion.button
-              initial={{ scale: 0, rotate: 180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: -180 }}
-              transition={{ type: "spring", damping: 15 }}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.08 }}
-              onClick={() => setShowSaved(true)}
-              className="p-3.5 sm:p-4 rounded-2xl shadow-xl pointer-events-auto flex items-center gap-2.5 font-bold relative overflow-hidden group"
-              style={{ backgroundColor: theme.accent, color: '#FFF' }}
-            >
-              {/* Pulse animation */}
-              <motion.div
-                className="absolute inset-0 rounded-2xl"
-                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                style={{ backgroundColor: 'white' }}
-              />
-              
-              <Bookmark className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" fill="currentColor" />
-              <motion.span 
-                key={savedArticles.size}
-                initial={{ scale: 1.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-base sm:text-lg relative z-10"
-              >
-                {savedArticles.size}
-              </motion.span>
-            </motion.button>
-          )}
-        </AnimatePresence>
+        </div>
+        <div className="pointer-events-auto">
+          <AnimatedButton
+            onClick={() => setShowSaved(true)}
+            icon={Bookmark}
+            isFilled={savedArticlesList.length > 0}
+            label={savedArticlesList.length > 0 ? `${savedArticlesList.length}` : undefined}
+            style={{ backgroundColor: theme.bg[0], color: theme.accent, border: `1px solid ${theme.accent}20` }}
+          />
+        </div>
       </div>
 
-      {/* Main Scroll Container */}
-      <div
-        ref={containerRef}
-        className="h-screen w-screen overflow-y-auto relative"
-        style={{ scrollBehavior: 'smooth' }}
-      >
-        {articles.length === 0 && !loadingMore && (
-          <div className="h-screen flex flex-col items-center justify-center gap-4">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            >
-              <Loader2 className="w-12 h-12" style={{ color: theme.accent }} />
-            </motion.div>
-            <motion.p 
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="font-semibold text-base" 
-              style={{ color: theme.accent }}
-            >
-              Curating your feed...
-            </motion.p>
-          </div>
-        )}
-        
+      <div ref={containerRef} className="h-full overflow-y-scroll snap-container" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <style dangerouslySetInnerHTML={{ __html: `div[ref="containerRef"]::-webkit-scrollbar{display:none}` }} />
         {articles.map((article, index) => (
-          <div key={article.id} className="h-screen w-full relative">
-            <StackedCard
-              article={article}
-              index={index}
-              onSave={handleSave}
-              isSaved={savedArticles.has(article.id)}
-              colorTheme={theme}
-              scrollProgress={scrollProgress}
-            />
+          <div key={article.id} className="h-screen snap-item">
+            <StackedCard article={article} index={index} onSave={handleSave} isSaved={savedArticles.has(article.id)} colorTheme={theme} scrollProgress={scrollY} />
           </div>
         ))}
-        
-        {loadingMore && articles.length > 0 && (
-          <div className="fixed top-6 sm:top-8 left-1/2 -translate-x-1/2 z-[60]">
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              className="px-5 sm:px-6 py-3 rounded-full bg-white/90 backdrop-blur-lg shadow-xl flex items-center gap-3"
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              >
-                <Loader2 className="w-5 h-5" style={{ color: theme.accent }} />
-              </motion.div>
-              <span className="text-sm font-bold" style={{ color: theme.accent }}>Loading more...</span>
-            </motion.div>
-          </div>
+        {loadingMore && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-screen flex items-center justify-center">
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}><Loader2 className="w-12 h-12" style={{ color: theme.accent }} /></motion.div>
+          </motion.div>
         )}
       </div>
     </div>
   );
 };
 
-const App = () => <ReelFeed />;
-export default App;
+export default ReelFeed;
