@@ -344,8 +344,8 @@ const StackedCard = ({
       scrollOneCard(e.deltaY);
     };
 
-    contentEl.addEventListener("wheel", () => {}, { passive: false });
-    return () => {};
+    contentEl.addEventListener("wheel", () => { }, { passive: false });
+    return () => { };
   }, [containerRef]);
 
   const handleShare = async (method) => {
@@ -389,9 +389,9 @@ const StackedCard = ({
         height: "100vh",
         height: "100dvh",
       }}
-      className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8"
+      className="flex items-center justify-center px-2 sm:px-4 md:px-6 lg:px-8"
     >
-      <div className="w-full max-w-xs sm:max-w-2xl md:max-w-4xl h-[80vh] sm:h-[85vh] md:h-[90vh]">
+      <div className="w-full max-w-xs sm:max-w-2xl md:max-w-4xl h-[88vh] sm:h-[85vh] md:h-[90vh]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -400,7 +400,7 @@ const StackedCard = ({
           className="w-full h-full rounded-2xl sm:rounded-3xl flex flex-col relative overflow-hidden pointer-events-auto"
           style={{
             backgroundColor: bgColor,
-            boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`,
+            boxShadow: `0 30px 60px -15px rgba(0,0,0,0.25), 0 0 0 1px ${accentColor}20`, // enhanced shadow on mobile
             WebkitUserSelect: "auto",
             userSelect: "auto",
           }}
@@ -659,8 +659,8 @@ const ReelFeed = () => {
     let isTouching = false;
     let lock = false;
 
-    const SWIPE_THRESHOLD = 35; // px, increase if too sensitive
-    const LOCK_MS = 700;
+    const SWIPE_THRESHOLD = 50; // increased from 35 to make it slower/less sensitive
+    const LOCK_MS = 1000;
 
     const pageBy = (dir) => {
       if (lock) return;
