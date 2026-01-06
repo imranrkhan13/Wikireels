@@ -163,15 +163,15 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
   return (
     <motion.div
       style={{ y, scale, opacity, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, fontFamily: "'Inter', sans-serif", pointerEvents: "none", willChange: "transform, opacity" }}
-      className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8"
+      className="flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6"
     >
-      <div className="w-full max-w-4xl h-[90vh] pointer-events-none">
+      <div className="w-full max-w-4xl h-screen sm:h-[90vh] pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -10 }} // Card lifts on hover
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none" // pointer-events-none to allow scroll through, only buttons have pointer-events-auto
+          className="w-full h-full rounded-2xl sm:rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none" // pointer-events-none to allow scroll through, only buttons have pointer-events-auto
           style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15` }}
         >
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -179,14 +179,14 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             <motion.div animate={{ scale: [1.2, 1, 1.2], rotate: [90, 0, 90], opacity: [0.02, 0.04, 0.02] }} transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }} className="absolute -bottom-1/4 -left-1/4 w-full h-full rounded-full blur-3xl" style={{ backgroundColor: accentColor }} />
           </div>
 
-          <div className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pb-3 sm:pb-4">
+          <div className="relative z-20 flex-shrink-0 p-4 sm:p-5 md:p-6 lg:p-8 pb-2 sm:pb-3">
             <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3" style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
                   <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}><Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></motion.div>
                   Wikipedia Discovery
                 </motion.div>
-                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
+                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
               </div>
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
                 <AnimatedButton onClick={() => onSave(article.id)} icon={Bookmark} isFilled={isSaved} style={{ backgroundColor: isSaved ? accentColor : `${accentColor}12`, color: isSaved ? '#FFFFFF' : accentColor }} />
@@ -205,25 +205,25 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </div>
           </div>
 
-          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-5 sm:px-6 md:px-8 lg:px-10 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-4 sm:px-5 md:px-6 lg:px-8 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-2/5 sm:w-3/5 md:w-2/5 lg:w-1/3 float-right ml-4 sm:ml-5 md:ml-6 mb-2 sm:mb-4 md:mb-5">
-                  <div className="relative aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border select-none" style={{ borderColor: `${accentColor}10` }}>
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-1/3 sm:w-2/5 md:w-2/5 lg:w-1/3 float-right ml-2 sm:ml-4 md:ml-5 mb-2 sm:mb-3 md:mb-4">
+                  <div className="relative aspect-[4/3] rounded-lg sm:rounded-2xl overflow-hidden shadow-lg border select-none" style={{ borderColor: `${accentColor}10` }}>
                     {!imageLoaded && <div className="absolute inset-0 bg-black/5 animate-pulse flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin opacity-20" /></div>}
                     <img src={article.imageUrl} alt={article.title} onLoad={() => setImageLoaded(true)} className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} draggable="false" />
                   </div>
                 </motion.div>
               )}
               <div className="select-text">
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="text-sm sm:text-base md:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor }}>{article.summary}</motion.p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor }}>{article.summary}</motion.p>
               </div>
               <div className="clear-both"></div>
             </motion.div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pt-3 sm:pt-4 border-t pointer-events-auto" style={{ borderColor: `${accentColor}10` }}>
-            <motion.a href={article.url} target="_blank" rel="noopener noreferrer" whileHover={{ x: 8, scale: 1.02 }} className="inline-flex items-center gap-2.5 text-sm sm:text-base font-bold group" style={{ color: accentColor }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-4 sm:p-5 md:p-6 lg:p-8 pt-2 sm:pt-3 border-t pointer-events-auto" style={{ borderColor: `${accentColor}10` }}>
+            <motion.a href={article.url} target="_blank" rel="noopener noreferrer" whileHover={{ x: 8, scale: 1.02 }} className="inline-flex items-center gap-2 text-xs sm:text-sm md:text-base font-bold group" style={{ color: accentColor }}>
               Read full article on Wikipedia
               <motion.div whileHover={{ x: 3, y: -3 }} transition={{ type: "spring", stiffness: 400 }}><ExternalLink className="w-4.5 h-4.5 sm:w-5 sm:h-5" /></motion.div>
             </motion.a>
