@@ -215,7 +215,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
         bottom: 0,
         zIndex: 10,
         fontFamily: "'Inter', sans-serif",
-        pointerEvents: "none",
+        pointerEvents: "auto",
         willChange: "transform, opacity",
         height: '100vh',
         height: '100dvh' 
@@ -229,7 +229,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
           whileHover={{ y: -10 }}
           transition={{ duration: 0.5 }}
           className="w-full h-full rounded-2xl sm:rounded-3xl flex flex-col relative overflow-hidden pointer-events-none"
-          style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`, WebkitUserSelect: 'none' }}
+          style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`, WebkitUserSelect: 'auto', userSelect: 'auto' }}
         >
           <div className="absolute 
           inset-0 
@@ -240,13 +240,13 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
           </div>
 
           <div className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pb-1.5 sm:pb-2 md:pb-3 group">
-            <div className="flex items-start justify-between gap-3 sm:gap-4 pointer-events-none">
-              <div className="flex-1 min-w-0">
-                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3" style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0" style={{ pointerEvents: 'auto' }}>
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3" style={{ backgroundColor: `${accentColor}12`, color: accentColor, pointerEvents: 'none' }}>
                   <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}><Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></motion.div>
                   Wikipedia Discovery
                 </motion.div>
-                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
+                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor, userSelect: 'text', WebkitUserSelect: 'text' }}>{article.title}</motion.h2>
               </div>
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 pointer-events-auto">
                 <AnimatedButton onClick={() => onSave(article.id)} icon={Bookmark} isFilled={isSaved} style={{ backgroundColor: isSaved ? accentColor : `${accentColor}12`, color: isSaved ? '#FFFFFF' : accentColor }} />
@@ -272,15 +272,15 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-1/3 sm:w-2/5 md:w-2/5 lg:w-1/3 float-right ml-2 sm:ml-4 md:ml-5 mb-2 sm:mb-3 md:mb-4">
-                  <div className="relative aspect-[4/3] rounded-lg sm:rounded-2xl overflow-hidden shadow-lg border select-none" style={{ borderColor: `${accentColor}10`, pointerEvents: 'auto' }}>
+                  <div className="relative aspect-[4/3] rounded-lg sm:rounded-2xl overflow-hidden shadow-lg border" style={{ borderColor: `${accentColor}10`, pointerEvents: 'auto' }}>
                     {!imageLoaded && <div className="absolute inset-0 bg-black/5 animate-pulse flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin opacity-20" /></div>}
                     <img src={article.imageUrl} alt={article.title} onLoad={() => setImageLoaded(true)} className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} draggable="false" />
                   </div>
                 </motion.div>
               )}
-              <div className="select-text" style={{ pointerEvents: 'auto' }}>
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor, pointerEvents: 'auto' }}>{article.summary}</p>
+              <div className="select-text" style={{ pointerEvents: 'auto', userSelect: 'text', WebkitUserSelect: 'text' }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
+                  <p className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor, pointerEvents: 'auto', userSelect: 'text', WebkitUserSelect: 'text' }}>{article.summary}</p>
                 </motion.div>
               </div>
               <div className="clear-both"></div>
