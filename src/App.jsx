@@ -397,7 +397,7 @@ const StackedCard = ({
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -10 }}
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-2xl sm:rounded-3xl flex flex-col relative overflow-hidden pointer-events-none"
+          className="w-full h-full rounded-2xl sm:rounded-3xl flex flex-col relative overflow-hidden pointer-events-auto"
           style={{
             backgroundColor: bgColor,
             boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`,
@@ -649,6 +649,67 @@ const ReelFeed = () => {
 
   const theme = COLOR_THEMES[currentTheme];
   const { scrollY } = useScroll({ container: containerRef });
+  useEffect(() => {
+    const outerEl = containerRef.current;
+    if (!outerEl) return;
+
+    const getVh = () => window.innerHeight || outerEl.clientHeight || 1;
+
+    let startY = 0;
+    let isTouching = false;
+    let lock = false;
+
+    const SWIPE_THRESHOLD = 35; // px, increase if too sensitive
+    const LOCK_MS = 700;
+
+    const pageBy = (dir) => {
+      if (lock) return;
+      lock = true;
+
+      const vh = getVh();
+      const currentIndex = Math.round(outerEl.scrollTop / vh);
+      const nextIndex = Math.max(0, currentIndex + (dir > 0 ? 1 : -1));
+
+      outerEl.scrollTo({ top: nextIndex * vh, behavior: "smooth" });
+
+      window.setTimeout(() => {
+        lock = false;
+      }, LOCK_MS);
+    };
+
+    const onTouchStart = (e) => {
+      isTouching = true;
+      startY = e.touches[0].clientY;
+    };
+
+    const onTouchMove = (e) => {
+      // IMPORTANT: don't preventDefault here, or you’ll break iOS scrolling
+      if (!isTouching || lock) return;
+    };
+
+    const onTouchEnd = (e) => {
+      if (!isTouching || lock) return;
+      isTouching = false;
+
+      const endY = (e.changedTouches?.[0]?.clientY ?? startY);
+      const delta = startY - endY; // positive = swipe up
+
+      if (Math.abs(delta) >= SWIPE_THRESHOLD) {
+        pageBy(delta); // delta>0 => next, delta<0 => prev
+      }
+    };
+
+    outerEl.addEventListener("touchstart", onTouchStart, { passive: true });
+    outerEl.addEventListener("touchmove", onTouchMove, { passive: true });
+    outerEl.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    return () => {
+      outerEl.removeEventListener("touchstart", onTouchStart);
+      outerEl.removeEventListener("touchmove", onTouchMove);
+      outerEl.removeEventListener("touchend", onTouchEnd);
+    };
+  }, []);
+
   useEffect(() => {
     const outerEl = containerRef.current;
     if (!outerEl) return;
@@ -1164,6 +1225,7 @@ const ReelFeed = () => {
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
           overscrollBehavior: "none",
         }}
       >
