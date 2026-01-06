@@ -98,20 +98,17 @@ const AnimatedButton = ({ onClick, icon: Icon, isFilled = false, label, classNam
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.08 }}
       className={`relative p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl shadow-lg transition-all overflow-hidden pointer-events-auto ${className}`}
-      style={style}
-    >
+      style={style}>
       <motion.div
         className="absolute inset-0"
         animate={isHovered ? { opacity: 0.3 } : { opacity: 0 }}
         transition={{ duration: 0.3 }}
-        style={{ backgroundColor: 'white', borderRadius: 'inherit' }}
-      />
+        style={{ backgroundColor: 'white', borderRadius: 'inherit' }}/>
 
       <div className="relative z-10 flex items-center gap-2">
         <motion.div
           animate={isHovered ? { rotate: 360, scale: 1.1 } : { rotate: 0, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+          transition={{ duration: 0.5 }} >
           <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill={isFilled ? "currentColor" : "none"} />
         </motion.div>
         {label && <span className="font-bold text-sm sm:text-base">{label}</span>}
@@ -158,13 +155,13 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
     const getVh = () => window.innerHeight || outerEl.clientHeight || 1;
 
     const scrollOneCard = (dir) => {
-      // --- Hard lock: one navigation at a time ---
+
       if (outerEl.__pagingLock) return;
       outerEl.__pagingLock = true;
 
       const vh = getVh();
 
-      // Use a stable page index (don’t recompute from scrollTop during smooth scroll)
+     
       const currentIndex =
         typeof outerEl.__pageIndex === "number"
           ? outerEl.__pageIndex
@@ -179,7 +176,6 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
         behavior: "smooth",
       });
 
-      // Release lock after animation window
       window.setTimeout(() => {
         outerEl.__pagingLock = false;
       }, 700);
@@ -189,16 +185,12 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
       e.preventDefault();
       e.stopPropagation();
 
-      // Always page the feed (TikTok style)
       scrollOneCard(e.deltaY);
     };
 
-    contentEl.addEventListener("wheel", () => {}, { passive: false });
-    return () => {};
+    contentEl.addEventListener("wheel", () => { }, { passive: false });
+    return () => { };
   }, [containerRef]);
-
-
-
 
   const handleShare = async (method) => {
     const shareData = { title: article.title, text: `Check out: ${article.title}`, url: article.url };
@@ -226,7 +218,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
         pointerEvents: "none",
         willChange: "transform, opacity",
         height: '100vh',
-        height: '100dvh' // Use dynamic viewport height
+        height: '100dvh' 
       }}
       className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8"
     >
@@ -276,11 +268,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
           <div
             ref={contentScrollRef}
             className="flex-1 overflow-y-hidden px-3 sm:px-4 md:px-6 lg:px-8 custom-scrollbar relative z-10"
-            style={{ pointerEvents: "auto", overscrollBehavior: "none" }}
-          >
-
-
-
+            style={{ pointerEvents: "auto", overscrollBehavior: "none" }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-1/3 sm:w-2/5 md:w-2/5 lg:w-1/3 float-right ml-2 sm:ml-4 md:ml-5 mb-2 sm:mb-3 md:mb-4">
@@ -312,7 +300,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
 };
 
 const ReelFeed = () => {
-  
+
   const [articles, setArticles] = useState([]);
   const [usedTitles] = useState(new Set());
   const [loadingMore, setLoadingMore] = useState(false);
@@ -333,7 +321,7 @@ const ReelFeed = () => {
     let lock = false;
     let accumulated = 0;
 
-    const THRESHOLD = 40;     // raise if your trackpad is very sensitive (try 60–90)
+    const THRESHOLD = 40;     // raise if the trackpad is very sensitive (try 60–90)
     const LOCK_MS = 900;      // long enough to finish smooth scroll + snap
 
     const pageTo = (dir) => {
@@ -358,12 +346,9 @@ const ReelFeed = () => {
     };
 
     const onWheel = (e) => {
-      // prevent browser/native scroll so only our paging happens
+      // prevent browser scroll so only our paging happens
       e.preventDefault();
-
-      // accumulate deltas from trackpad gesture
       accumulated += e.deltaY;
-
       if (Math.abs(accumulated) >= THRESHOLD) {
         pageTo(accumulated);
       }
@@ -416,17 +401,32 @@ const ReelFeed = () => {
   };
 
   const savedArticlesList = useMemo(() => articles.filter(a => savedArticles.has(a.id)), [articles, savedArticles]);
- 
+
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ backgroundColor: theme.gradient[0], fontFamily: "'Inter', sans-serif" }}>
+    <div
+      className="fixed inset-0 overflow-hidden"
+      style={{ backgroundColor: theme.gradient[0], fontFamily: "'Inter', sans-serif" }}>
       <style dangerouslySetInnerHTML={{ __html: `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');.custom-scrollbar::-webkit-scrollbar{width:8px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:10px}.custom-scrollbar::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.2)}.custom-scrollbar{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.12) transparent}.select-text{user-select:text;-webkit-user-select:text}.select-none{user-select:none;-webkit-user-select:none}*{-webkit-tap-highlight-color:transparent}.snap-container{scroll-snap-type:y mandatory;scroll-behavior:smooth}.snap-item{scroll-snap-align:start;scroll-snap-stop:always}` }} />
 
       <AnimatePresence>
         {showThemes && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md" onClick={() => setShowThemes(false)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col" style={{ backgroundColor: theme.bg[0] }}>
-              <div className="flex-shrink-0 p-6 sm:p-8 border-b" style={{ borderColor: `${theme.accent}10` }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md"
+            onClick={() => setShowThemes(false)}>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+              style={{ backgroundColor: theme.bg[0] }}>
+              <div
+                className="flex-shrink-0 p-6 sm:p-8 border-b"
+                style={{ borderColor: `${theme.accent}10` }}>
                 <div className="flex items-center justify-between">
                   <div>
                     <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: theme.text[0] }}>Color Themes</motion.h2>
@@ -438,12 +438,59 @@ const ReelFeed = () => {
               <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {COLOR_THEMES.map((t, idx) => (
-                    <motion.button key={t.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} onClick={() => { setCurrentTheme(idx); setTimeout(() => setShowThemes(false), 200); }} whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }} className="p-5 rounded-2xl text-left transition-all relative overflow-hidden group" style={{ backgroundColor: t.bg[0], border: currentTheme === idx ? `2px solid ${t.accent}` : '2px solid transparent', boxShadow: currentTheme === idx ? `0 8px 24px ${t.accent}25` : '0 2px 8px rgba(0,0,0,0.05)' }}>
-                      {t.isPopular && <motion.div initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 15 }} className="absolute top-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-md"><Crown className="w-3 h-3" />Popular</motion.div>}
-                      {t.isDefault && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2.5 right-2.5 text-white px-2.5 py-1 rounded-full text-[10px] font-bold shadow-md" style={{ backgroundColor: t.accent }}>Default</motion.div>}
-                      <div className="flex gap-2 mb-3">{t.bg.slice(0, 4).map((c, i) => <motion.div key={i} initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: idx * 0.05 + i * 0.05, type: "spring" }} className="w-6 h-6 rounded-lg shadow-sm" style={{ backgroundColor: c }} />)}</div>
-                      <p className="font-bold text-base mb-0.5" style={{ color: t.text[0] }}>{t.name}</p>
-                      {currentTheme === idx && <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-xs opacity-60 mt-1" style={{ color: t.text[0] }}>✓ Active</motion.p>}
+                    <motion.button
+                      key={t.name}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      onClick={() => {
+                        setCurrentTheme(idx);
+                        setTimeout(() => setShowThemes(false), 200);
+                      }}
+                      whileHover={{ scale: 1.03, y: -4 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="p-5 rounded-2xl text-left transition-all relative overflow-hidden group"
+                      style={{ backgroundColor: t.bg[0], border: currentTheme === idx ? `2px solid ${t.accent}` : '2px solid transparent', boxShadow: currentTheme === idx ? `0 8px 24px ${t.accent}25` : '0 2px 8px rgba(0,0,0,0.05)' }}>
+                      {t.isPopular &&
+                        <motion.div
+                          initial={{ scale: 0, rotate: -45 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: "spring", damping: 15 }}
+                          className="absolute top-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-md"><Crown className="w-3 h-3" />
+                          Popular
+                        </motion.div>}
+                      {t.isDefault &&
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute top-2.5 right-2.5 text-white px-2.5 py-1 rounded-full text-[10px] font-bold shadow-md"
+                          style={{ backgroundColor: t.accent }}>
+                          Default
+                        </motion.div>}
+                      <div
+                        className="flex gap-2 mb-3">
+                        {t.bg.slice(0, 4).map((c, i) =>
+                          <motion.div
+                            key={i}
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ delay: idx * 0.05 + i * 0.05, type: "spring" }}
+                            className="w-6 h-6 rounded-lg shadow-sm"
+                            style={{ backgroundColor: c }} />)}
+                      </div>
+                      <p
+                        className="font-bold text-base mb-0.5"
+                        style={{ color: t.text[0] }}>
+                        {t.name}
+                      </p>
+                      {currentTheme === idx &&
+                        <motion.p
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs opacity-60 mt-1"
+                          style={{ color: t.text[0] }}>
+                          ✓ Active
+                        </motion.p>}
                     </motion.button>
                   ))}
                 </div>
@@ -455,23 +502,79 @@ const ReelFeed = () => {
 
       <AnimatePresence>
         {showSaved && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md" onClick={() => setShowSaved(false)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col" style={{ backgroundColor: theme.bg[0] }}>
-              <div className="flex-shrink-0 p-6 sm:p-8 border-b" style={{ borderColor: `${theme.accent}10` }}>
-                <div className="flex items-center justify-between">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md"
+            onClick={() => setShowSaved(false)}>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+              style={{ backgroundColor: theme.bg[0] }}>
+              <div
+                className="flex-shrink-0 p-6 sm:p-8 border-b"
+                style={{ borderColor: `${theme.accent}10` }}>
+                <div
+                  className="flex items-center justify-between">
                   <div>
-                    <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: theme.text[0] }}>Saved Articles</motion.h2>
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-sm opacity-60" style={{ color: theme.text[0] }}>{savedArticlesList.length} {savedArticlesList.length === 1 ? 'article' : 'articles'} saved</motion.p>
+                    <motion.h2
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-2xl sm:text-3xl font-bold mb-1"
+                      style={{ color: theme.text[0] }}>
+                      Saved Articles
+                    </motion.h2>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="text-sm opacity-60"
+                      style={{ color: theme.text[0] }}>
+                      {savedArticlesList.length} {savedArticlesList.length === 1 ? 'article' : 'articles'}
+                      saved
+                    </motion.p>
                   </div>
-                  <motion.button onClick={() => setShowSaved(false)} whileHover={{ rotate: 90, scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-3 rounded-full hover:bg-black/5 transition-colors" style={{ color: theme.accent }}><X className="w-6 h-6" /></motion.button>
+                  <motion.button
+                    onClick={() => setShowSaved(false)}
+                    whileHover={{ rotate: 90, scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-3 rounded-full hover:bg-black/5 transition-colors"
+                    style={{ color: theme.accent }}>
+                    <X className="w-6 h-6" />
+                  </motion.button>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
                 {savedArticlesList.length === 0 ? (
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 15 }} className="inline-flex p-6 rounded-full mb-4" style={{ backgroundColor: `${theme.accent}12` }}><Bookmark className="w-12 h-12 opacity-30" style={{ color: theme.accent }} /></motion.div>
-                    <p className="text-lg font-semibold mb-2" style={{ color: theme.text[0] }}>No saved articles yet</p>
-                    <p className="text-sm opacity-60" style={{ color: theme.text[0] }}>Bookmark articles to read them later</p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-16">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", damping: 15 }}
+                      className="inline-flex p-6 rounded-full mb-4"
+                      style={{ backgroundColor: `${theme.accent}12` }}>
+                      <Bookmark
+                        className="w-12 h-12 opacity-30"
+                        style={{ color: theme.accent }} />
+                    </motion.div>
+                    <p
+                      className="text-lg font-semibold mb-2"
+                      style={{ color: theme.text[0] }}>
+                      No saved articles yet
+                    </p>
+                    <p
+                      className="text-sm opacity-60"
+                      style={{ color: theme.text[0] }}>
+                      Bookmark articles to read them later
+                    </p>
                   </motion.div>
                 ) : (
                   <div className="space-y-3">
@@ -485,17 +588,32 @@ const ReelFeed = () => {
                         style={{ backgroundColor: theme.bg[1], border: `1px solid ${theme.accent}10` }}
                         onClick={() => scrollToArticle(article.id)}
                       >
-                        <div className="flex items-start gap-4">
+                        <div
+                          className="flex items-start gap-4">
                           {article.imageUrl && (
-                            <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden" style={{ border: `1px solid ${theme.accent}10` }}>
-                              <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+                            <div
+                              className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden"
+                              style={{ border: `1px solid ${theme.accent}10` }}>
+                              <img
+                                src={article.imageUrl}
+                                alt={article.title}
+                                className="w-full h-full object-cover" />
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-base sm:text-lg mb-1 line-clamp-1" style={{ color: theme.text[0] }}>{article.title}</h3>
-                            <p className="text-xs sm:text-sm opacity-60 line-clamp-2 mb-3" style={{ color: theme.text[0] }}>{article.summary}</p>
-                            <div className="flex items-center gap-3">
-                              <span className="inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: theme.accent }}>
+                            <h3
+                              className="font-bold text-base sm:text-lg mb-1 line-clamp-1"
+                              style={{ color: theme.text[0] }}>
+                              {article.title}
+                            </h3>
+                            <p
+                              className="text-xs sm:text-sm opacity-60 line-clamp-2 mb-3"
+                              style={{ color: theme.text[0] }}>{article.summary}</p>
+                            <div
+                              className="flex items-center gap-3">
+                              <span
+                                className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                                style={{ color: theme.accent }}>
                                 View in Feed
                               </span>
                               <motion.button
@@ -523,21 +641,50 @@ const ReelFeed = () => {
         )}
       </AnimatePresence>
 
-      {/* Header - Hidden on mobile, shown on sm+ */}
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="fixed top-0 left-0 right-0 z-50 p-4 sm:p-6 pointer-events-none hidden sm:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl shadow-xl pointer-events-auto" style={{ backgroundColor: theme.bg[0], border: `1px solid ${theme.accent}15` }}>
-            <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}><Sparkles className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: theme.accent }} /></motion.div>
-            <span className="font-bold text-base sm:text-lg tracking-tight" style={{ color: theme.text[0] }}>WikiScroll</span>
+      {/* header hidden on the mobile  */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed top-0 left-0 right-0 z-50 p-4 sm:p-6 pointer-events-none hidden sm:block">
+        <div
+          className="max-w-7xl mx-auto flex items-center justify-between">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl shadow-xl pointer-events-auto"
+            style={{ backgroundColor: theme.bg[0], border: `1px solid ${theme.accent}15` }}>
+
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
+              <Sparkles
+                className="w-5 h-5 sm:w-6 sm:h-6"
+                style={{ color: theme.accent }} />
+            </motion.div>
+            <span
+              className="font-bold text-base sm:text-lg tracking-tight"
+              style={{ color: theme.text[0] }}>
+              WikiScroll
+            </span>
           </motion.div>
-          <div className="flex items-center gap-2 sm:gap-2.5 pointer-events-auto">
-            <AnimatedButton onClick={() => setShowSaved(true)} icon={Bookmark} isFilled={savedArticlesList.length > 0} label={savedArticlesList.length > 0 ? `${savedArticlesList.length}` : undefined} style={{ backgroundColor: savedArticlesList.length > 0 ? theme.accent : `${theme.accent}12`, color: savedArticlesList.length > 0 ? '#FFFFFF' : theme.accent }} />
-            <AnimatedButton onClick={() => setShowThemes(true)} icon={Palette} style={{ backgroundColor: `${theme.accent}12`, color: theme.accent }} />
+          <div
+            className="flex items-center gap-2 sm:gap-2.5 pointer-events-auto">
+            <AnimatedButton
+              onClick={() => setShowSaved(true)}
+              icon={Bookmark}
+              isFilled={savedArticlesList.length > 0}
+              label={savedArticlesList.length > 0 ? `${savedArticlesList.length}` : undefined}
+              style={{ backgroundColor: savedArticlesList.length > 0 ? theme.accent : `${theme.accent}12`, color: savedArticlesList.length > 0 ? '#FFFFFF' : theme.accent }} />
+            <AnimatedButton
+              onClick={() => setShowThemes(true)}
+              icon={Palette}
+              style={{ backgroundColor: `${theme.accent}12`, color: theme.accent }} />
           </div>
         </div>
       </motion.div>
 
-      {/* Mobile-only floating buttons */}
+      {/*include buttons below on mobile */}
       <div className="sm:hidden fixed bottom-6 left-6 right-6 z-[60] flex justify-between pointer-events-none">
         <div className="pointer-events-auto">
           <AnimatedButton
@@ -568,7 +715,7 @@ const ReelFeed = () => {
       >
 
 
-
+        {/*html import fonts just learned this */}
         <style dangerouslySetInnerHTML={{ __html: `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');.custom-scrollbar::-webkit-scrollbar{width:8px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:10px}.custom-scrollbar::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.2)}.custom-scrollbar{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.12) transparent}.select-text{user-select:text;-webkit-user-select:text}.select-none{user-select:none;-webkit-user-select:none}*{-webkit-tap-highlight-color:transparent}.snap-container{scroll-snap-type:y mandatory;}.snap-item{scroll-snap-align:start;scroll-snap-stop:always;height:100vh;min-height:100vh;}` }} />
         {articles.map((article, index) => (
           <div key={article.id} className="h-screen snap-item" style={{ height: '100vh', minHeight: '100vh', scrollSnapAlign: 'start', scrollSnapStop: 'always' }}>
@@ -584,14 +731,23 @@ const ReelFeed = () => {
           </div>
         ))}
         {loadingMore && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-screen flex items-center justify-center">
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}><Loader2 className="w-12 h-12" style={{ color: theme.accent }} /></motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="h-screen flex items-center justify-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+              <Loader2
+                className="w-12 h-12"
+                style={{ color: theme.accent }} />
+            </motion.div>
           </motion.div>
         )}
       </div>
     </div>
   );
-  
+
 };
 
 export default ReelFeed;
