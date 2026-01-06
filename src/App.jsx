@@ -120,7 +120,7 @@ const AnimatedButton = ({ onClick, icon: Icon, isFilled = false, label, classNam
   );
 };
 
-const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgress }) => {
+const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgress, containerRef }) => {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const contentScrollRef = useRef(null);
@@ -150,33 +150,55 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
   const scale = useTransform(scrollProgress, [start - vh, start, end, end + vh], [0.93, 1, 1, 0.93]);
   const opacity = useTransform(scrollProgress, [start - vh, start, end, end + vh], [0, 1, 1, 0]);
 
-  // Handle scroll overflow - let scroll pass through when content is fully scrolled
   useEffect(() => {
     const contentEl = contentScrollRef.current;
-    if (!contentEl) return;
+    const outerEl = containerRef?.current;
+    if (!contentEl || !outerEl) return;
 
-    let lastTouchY = 0;
-    const handleTouchStart = (e) => {
-      lastTouchY = e.touches[0].clientY;
+    const getVh = () => window.innerHeight || outerEl.clientHeight || 1;
+
+    const scrollOneCard = (dir) => {
+      // --- Hard lock: one navigation at a time ---
+      if (outerEl.__pagingLock) return;
+      outerEl.__pagingLock = true;
+
+      const vh = getVh();
+
+      // Use a stable page index (don’t recompute from scrollTop during smooth scroll)
+      const currentIndex =
+        typeof outerEl.__pageIndex === "number"
+          ? outerEl.__pageIndex
+          : Math.round(outerEl.scrollTop / vh);
+
+      const nextIndex = Math.max(0, currentIndex + (dir > 0 ? 1 : -1));
+
+      outerEl.__pageIndex = nextIndex;
+
+      outerEl.scrollTo({
+        top: nextIndex * vh,
+        behavior: "smooth",
+      });
+
+      // Release lock after animation window
+      window.setTimeout(() => {
+        outerEl.__pagingLock = false;
+      }, 700);
     };
 
-    const handleTouchMove = (e) => {
-      const touchY = e.touches[0].clientY;
-      const isAtBottom = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight < 5;
-      const isAtTop = contentEl.scrollTop < 5;
-      const direction = touchY > lastTouchY ? 'down' : 'up';
-      
-      lastTouchY = touchY;
+    const onWheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Always page the feed (TikTok style)
+      scrollOneCard(e.deltaY);
     };
 
-    contentEl.addEventListener('touchstart', handleTouchStart, { passive: true });
-    contentEl.addEventListener('touchmove', handleTouchMove, { passive: true });
-    
-    return () => {
-      contentEl.removeEventListener('touchstart', handleTouchStart);
-      contentEl.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
+    contentEl.addEventListener("wheel", () => {}, { passive: false });
+    return () => {};
+  }, [containerRef]);
+
+
+
 
   const handleShare = async (method) => {
     const shareData = { title: article.title, text: `Check out: ${article.title}`, url: article.url };
@@ -190,16 +212,31 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
 
   return (
     <motion.div
-      style={{ y, scale, opacity, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, fontFamily: "'Inter', sans-serif", pointerEvents: "none", willChange: "transform, opacity" }}
+      style={{
+        y,
+        scale,
+        opacity,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 10,
+        fontFamily: "'Inter', sans-serif",
+        pointerEvents: "none",
+        willChange: "transform, opacity",
+        height: '100vh',
+        height: '100dvh' // Use dynamic viewport height
+      }}
       className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8"
     >
-      <div className="w-full max-w-xs sm:max-w-2xl md:max-w-4xl h-[80vh] sm:h-[85vh] md:h-[90vh] pointer-events-none">
+      <div className="w-full max-w-xs sm:max-w-2xl md:max-w-4xl h-[80vh] sm:h-[85vh] md:h-[90vh]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -10 }}
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-2xl sm:rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none"
+          className="w-full h-full rounded-2xl sm:rounded-3xl flex flex-col relative overflow-hidden pointer-events-none"
           style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`, WebkitUserSelect: 'none' }}
         >
           <div className="absolute 
@@ -210,8 +247,8 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             <motion.div animate={{ scale: [1.2, 1, 1.2], rotate: [90, 0, 90], opacity: [0.02, 0.04, 0.02] }} transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }} className="absolute -bottom-1/4 -left-1/4 w-full h-full rounded-full blur-3xl" style={{ backgroundColor: accentColor }} />
           </div>
 
-          <div className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pb-1.5 sm:pb-2 md:pb-3">
-            <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <div className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pb-1.5 sm:pb-2 md:pb-3 group">
+            <div className="flex items-start justify-between gap-3 sm:gap-4 pointer-events-none">
               <div className="flex-1 min-w-0">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3" style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
                   <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}><Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></motion.div>
@@ -219,7 +256,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
                 </motion.div>
                 <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
               </div>
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 pointer-events-auto">
                 <AnimatedButton onClick={() => onSave(article.id)} icon={Bookmark} isFilled={isSaved} style={{ backgroundColor: isSaved ? accentColor : `${accentColor}12`, color: isSaved ? '#FFFFFF' : accentColor }} />
                 <div className="relative">
                   <AnimatedButton onClick={() => setShowShareMenu(!showShareMenu)} icon={Share2} style={{ backgroundColor: `${accentColor}12`, color: accentColor }} />
@@ -236,24 +273,33 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </div>
           </div>
 
-          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-8 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div
+            ref={contentScrollRef}
+            className="flex-1 overflow-y-hidden px-3 sm:px-4 md:px-6 lg:px-8 custom-scrollbar relative z-10"
+            style={{ pointerEvents: "auto", overscrollBehavior: "none" }}
+          >
+
+
+
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-1/3 sm:w-2/5 md:w-2/5 lg:w-1/3 float-right ml-2 sm:ml-4 md:ml-5 mb-2 sm:mb-3 md:mb-4">
-                  <div className="relative aspect-[4/3] rounded-lg sm:rounded-2xl overflow-hidden shadow-lg border select-none" style={{ borderColor: `${accentColor}10` }}>
+                  <div className="relative aspect-[4/3] rounded-lg sm:rounded-2xl overflow-hidden shadow-lg border select-none" style={{ borderColor: `${accentColor}10`, pointerEvents: 'auto' }}>
                     {!imageLoaded && <div className="absolute inset-0 bg-black/5 animate-pulse flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin opacity-20" /></div>}
                     <img src={article.imageUrl} alt={article.title} onLoad={() => setImageLoaded(true)} className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} draggable="false" />
                   </div>
                 </motion.div>
               )}
-              <div className="select-text">
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor }}>{article.summary}</motion.p>
+              <div className="select-text" style={{ pointerEvents: 'auto' }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
+                  <p className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed font-normal opacity-90" style={{ color: textColor, pointerEvents: 'auto' }}>{article.summary}</p>
+                </motion.div>
               </div>
               <div className="clear-both"></div>
             </motion.div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pt-1.5 sm:pt-2 md:pt-3 border-t pointer-events-auto" style={{ borderColor: `${accentColor}10` }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pt-1.5 sm:pt-2 md:pt-3 border-t" style={{ borderColor: `${accentColor}10` }}>
             <motion.a href={article.url} target="_blank" rel="noopener noreferrer" whileHover={{ x: 8, scale: 1.02 }} className="inline-flex items-center gap-2 text-xs sm:text-sm md:text-base font-bold group" style={{ color: accentColor }}>
               Read full article on Wikipedia
               <motion.div whileHover={{ x: 3, y: -3 }} transition={{ type: "spring", stiffness: 400 }}><ExternalLink className="w-4.5 h-4.5 sm:w-5 sm:h-5" /></motion.div>
@@ -266,6 +312,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
 };
 
 const ReelFeed = () => {
+  
   const [articles, setArticles] = useState([]);
   const [usedTitles] = useState(new Set());
   const [loadingMore, setLoadingMore] = useState(false);
@@ -277,6 +324,54 @@ const ReelFeed = () => {
 
   const theme = COLOR_THEMES[currentTheme];
   const { scrollY } = useScroll({ container: containerRef });
+  useEffect(() => {
+    const outerEl = containerRef.current;
+    if (!outerEl) return;
+
+    const getVh = () => window.innerHeight || outerEl.clientHeight || 1;
+
+    let lock = false;
+    let accumulated = 0;
+
+    const THRESHOLD = 40;     // raise if your trackpad is very sensitive (try 60–90)
+    const LOCK_MS = 900;      // long enough to finish smooth scroll + snap
+
+    const pageTo = (dir) => {
+      if (lock) return;
+      lock = true;
+
+      const vh = getVh();
+      const currentIndex =
+        typeof outerEl.__pageIndex === "number"
+          ? outerEl.__pageIndex
+          : Math.round(outerEl.scrollTop / vh);
+
+      const nextIndex = Math.max(0, currentIndex + (dir > 0 ? 1 : -1));
+      outerEl.__pageIndex = nextIndex;
+
+      outerEl.scrollTo({ top: nextIndex * vh, behavior: "smooth" });
+
+      window.setTimeout(() => {
+        lock = false;
+        accumulated = 0;
+      }, LOCK_MS);
+    };
+
+    const onWheel = (e) => {
+      // prevent browser/native scroll so only our paging happens
+      e.preventDefault();
+
+      // accumulate deltas from trackpad gesture
+      accumulated += e.deltaY;
+
+      if (Math.abs(accumulated) >= THRESHOLD) {
+        pageTo(accumulated);
+      }
+    };
+
+    outerEl.addEventListener("wheel", onWheel, { passive: false });
+    return () => outerEl.removeEventListener("wheel", onWheel);
+  }, []);
 
   const loadArticles = async () => {
     if (loadingMore) return;
@@ -321,6 +416,7 @@ const ReelFeed = () => {
   };
 
   const savedArticlesList = useMemo(() => articles.filter(a => savedArticles.has(a.id)), [articles, savedArticles]);
+ 
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ backgroundColor: theme.gradient[0], fontFamily: "'Inter', sans-serif" }}>
@@ -461,11 +557,30 @@ const ReelFeed = () => {
         </div>
       </div>
 
-      <div ref={containerRef} className="h-full overflow-y-scroll snap-container" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        <style dangerouslySetInnerHTML={{ __html: `div[ref="containerRef"]::-webkit-scrollbar{display:none}` }} />
+      <div
+        ref={containerRef}
+        className="h-full overflow-y-scroll snap-container"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          overscrollBehavior: "none",
+        }}
+      >
+
+
+
+        <style dangerouslySetInnerHTML={{ __html: `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');.custom-scrollbar::-webkit-scrollbar{width:8px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:10px}.custom-scrollbar::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.2)}.custom-scrollbar{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.12) transparent}.select-text{user-select:text;-webkit-user-select:text}.select-none{user-select:none;-webkit-user-select:none}*{-webkit-tap-highlight-color:transparent}.snap-container{scroll-snap-type:y mandatory;}.snap-item{scroll-snap-align:start;scroll-snap-stop:always;height:100vh;min-height:100vh;}` }} />
         {articles.map((article, index) => (
-          <div key={article.id} className="h-screen snap-item">
-            <StackedCard article={article} index={index} onSave={handleSave} isSaved={savedArticles.has(article.id)} colorTheme={theme} scrollProgress={scrollY} />
+          <div key={article.id} className="h-screen snap-item" style={{ height: '100vh', minHeight: '100vh', scrollSnapAlign: 'start', scrollSnapStop: 'always' }}>
+            <StackedCard
+              article={article}
+              index={index}
+              onSave={handleSave}
+              isSaved={savedArticles.has(article.id)}
+              colorTheme={theme}
+              scrollProgress={scrollY}
+              containerRef={containerRef}
+            />
           </div>
         ))}
         {loadingMore && (
@@ -476,6 +591,7 @@ const ReelFeed = () => {
       </div>
     </div>
   );
+  
 };
 
 export default ReelFeed;

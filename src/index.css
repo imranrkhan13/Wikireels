@@ -72,3 +72,14 @@ html, body, #root {
     -webkit-user-select: text;
     -webkit-touch-callout: default;
 }
+
+/* Custom text selection color */
+.select-text::selection {
+    background-color: rgba(100, 200, 255, 0.4);
+    color: inherit;
+}
+
+.select-text::-moz-selection {
+    background-color: rgba(100, 200, 255, 0.4);
+    color: inherit;
+}
