@@ -155,42 +155,26 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
     const contentEl = contentScrollRef.current;
     if (!contentEl) return;
 
-    let isTouching = false;
-    let touchStartY = 0;
-
-    const handleWheel = (e) => {
-      const isAtBottom = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight < 5;
-      const isAtTop = contentEl.scrollTop < 5;
-      
-      if (!((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0))) {
-        return;
-      }
-    };
-
+    let lastTouchY = 0;
     const handleTouchStart = (e) => {
-      isTouching = true;
-      touchStartY = e.touches[0].clientY;
+      lastTouchY = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e) => {
-      if (!isTouching) return;
-      // Don't prevent default - let the browser handle scroll
+      const touchY = e.touches[0].clientY;
+      const isAtBottom = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight < 5;
+      const isAtTop = contentEl.scrollTop < 5;
+      const direction = touchY > lastTouchY ? 'down' : 'up';
+      
+      lastTouchY = touchY;
     };
 
-    const handleTouchEnd = () => {
-      isTouching = false;
-    };
-
-    contentEl.addEventListener('wheel', handleWheel, { passive: true });
     contentEl.addEventListener('touchstart', handleTouchStart, { passive: true });
     contentEl.addEventListener('touchmove', handleTouchMove, { passive: true });
-    contentEl.addEventListener('touchend', handleTouchEnd, { passive: true });
     
     return () => {
-      contentEl.removeEventListener('wheel', handleWheel);
       contentEl.removeEventListener('touchstart', handleTouchStart);
       contentEl.removeEventListener('touchmove', handleTouchMove);
-      contentEl.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
@@ -215,7 +199,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -10 }}
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-2xl sm:rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-auto"
+          className="w-full h-full rounded-2xl sm:rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none"
           style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15`, WebkitUserSelect: 'none' }}
         >
           <div className="absolute 
@@ -252,7 +236,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </div>
           </div>
 
-          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-8 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}>
+          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-8 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-1/3 sm:w-2/5 md:w-2/5 lg:w-1/3 float-right ml-2 sm:ml-4 md:ml-5 mb-2 sm:mb-3 md:mb-4">
