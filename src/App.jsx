@@ -150,6 +150,51 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
   const scale = useTransform(scrollProgress, [start - vh, start, end, end + vh], [0.93, 1, 1, 0.93]);
   const opacity = useTransform(scrollProgress, [start - vh, start, end, end + vh], [0, 1, 1, 0]);
 
+  // Handle scroll overflow - let scroll pass through when content is fully scrolled
+  useEffect(() => {
+    const contentEl = contentScrollRef.current;
+    if (!contentEl) return;
+
+    const handleWheel = (e) => {
+      const isAtBottom = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight < 5;
+      const isAtTop = contentEl.scrollTop < 5;
+      
+      // Only prevent default if we're in the middle of scrolling
+      if (!((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0))) {
+        // Content can scroll
+      }
+    };
+
+    // Handle touch scrolling for mobile
+    let lastTouchY = 0;
+    const handleTouchStart = (e) => {
+      lastTouchY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e) => {
+      const touchY = e.touches[0].clientY;
+      const isAtBottom = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight < 5;
+      const isAtTop = contentEl.scrollTop < 5;
+      const direction = touchY > lastTouchY ? 'down' : 'up';
+      
+      // Allow natural scrolling without blocking
+      if ((isAtTop && direction === 'down') || (isAtBottom && direction === 'up')) {
+        // Let the scroll pass through to parent
+      }
+      lastTouchY = touchY;
+    };
+
+    contentEl.addEventListener('wheel', handleWheel, { passive: true });
+    contentEl.addEventListener('touchstart', handleTouchStart, { passive: true });
+    contentEl.addEventListener('touchmove', handleTouchMove, { passive: true });
+    
+    return () => {
+      contentEl.removeEventListener('wheel', handleWheel);
+      contentEl.removeEventListener('touchstart', handleTouchStart);
+      contentEl.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
   const handleShare = async (method) => {
     const shareData = { title: article.title, text: `Check out: ${article.title}`, url: article.url };
     if (method === 'native' && navigator.share) {
@@ -163,30 +208,33 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
   return (
     <motion.div
       style={{ y, scale, opacity, position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, fontFamily: "'Inter', sans-serif", pointerEvents: "none", willChange: "transform, opacity" }}
-      className="flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6"
+      className="flex items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8"
     >
-      <div className="w-full max-w-4xl h-screen sm:h-[90vh] pointer-events-none">
+      <div className="w-full max-w-xs sm:max-w-2xl md:max-w-4xl h-[80vh] sm:h-[85vh] md:h-[90vh] pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ y: -10 }} // Card lifts on hover
+          whileHover={{ y: -10 }}
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-2xl sm:rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none" // pointer-events-none to allow scroll through, only buttons have pointer-events-auto
+          className="w-full h-full rounded-2xl sm:rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none"
           style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15` }}
         >
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute 
+          inset-0 
+          pointer-events-none 
+          overflow-hidden">
             <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], opacity: [0.03, 0.05, 0.03] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-1/4 -right-1/4 w-full h-full rounded-full blur-3xl" style={{ backgroundColor: accentColor }} />
             <motion.div animate={{ scale: [1.2, 1, 1.2], rotate: [90, 0, 90], opacity: [0.02, 0.04, 0.02] }} transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }} className="absolute -bottom-1/4 -left-1/4 w-full h-full rounded-full blur-3xl" style={{ backgroundColor: accentColor }} />
           </div>
 
-          <div className="relative z-20 flex-shrink-0 p-4 sm:p-5 md:p-6 lg:p-8 pb-2 sm:pb-3">
+          <div className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pb-1.5 sm:pb-2 md:pb-3">
             <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3" style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
                   <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}><Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></motion.div>
                   Wikipedia Discovery
                 </motion.div>
-                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
+                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight" style={{ color: textColor }}>{article.title}</motion.h2>
               </div>
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
                 <AnimatedButton onClick={() => onSave(article.id)} icon={Bookmark} isFilled={isSaved} style={{ backgroundColor: isSaved ? accentColor : `${accentColor}12`, color: isSaved ? '#FFFFFF' : accentColor }} />
@@ -205,7 +253,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </div>
           </div>
 
-          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-4 sm:px-5 md:px-6 lg:px-8 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-8 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-1/3 sm:w-2/5 md:w-2/5 lg:w-1/3 float-right ml-2 sm:ml-4 md:ml-5 mb-2 sm:mb-3 md:mb-4">
@@ -222,7 +270,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </motion.div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-4 sm:p-5 md:p-6 lg:p-8 pt-2 sm:pt-3 border-t pointer-events-auto" style={{ borderColor: `${accentColor}10` }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-3 sm:p-4 md:p-6 lg:p-8 pt-1.5 sm:pt-2 md:pt-3 border-t pointer-events-auto" style={{ borderColor: `${accentColor}10` }}>
             <motion.a href={article.url} target="_blank" rel="noopener noreferrer" whileHover={{ x: 8, scale: 1.02 }} className="inline-flex items-center gap-2 text-xs sm:text-sm md:text-base font-bold group" style={{ color: accentColor }}>
               Read full article on Wikipedia
               <motion.div whileHover={{ x: 3, y: -3 }} transition={{ type: "spring", stiffness: 400 }}><ExternalLink className="w-4.5 h-4.5 sm:w-5 sm:h-5" /></motion.div>
