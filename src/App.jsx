@@ -97,7 +97,7 @@ const AnimatedButton = ({ onClick, icon: Icon, isFilled = false, label, classNam
       onMouseLeave={() => setIsHovered(false)}
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.08 }}
-      className={`relative p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl shadow-lg transition-all overflow-hidden ${className}`}
+      className={`relative p-2.5 sm:p-3 md:p-3.5 rounded-xl sm:rounded-2xl shadow-lg transition-all overflow-hidden pointer-events-auto ${className}`}
       style={style}
     >
       <motion.div
@@ -171,7 +171,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -10 }} // Card lifts on hover
           transition={{ duration: 0.5 }}
-          className="w-full h-full rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-auto" // pointer-events-auto here for hover
+          className="w-full h-full rounded-3xl sm:rounded-[2.5rem] flex flex-col relative overflow-hidden pointer-events-none" // pointer-events-none to allow scroll through, only buttons have pointer-events-auto
           style={{ backgroundColor: bgColor, boxShadow: `0 25px 50px -12px rgba(0,0,0,0.2), 0 0 0 1px ${accentColor}15` }}
         >
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -205,7 +205,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </div>
           </div>
 
-          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-5 sm:px-6 md:px-8 lg:px-10 custom-scrollbar relative z-10" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-5 sm:px-6 md:px-8 lg:px-10 custom-scrollbar relative z-10 pointer-events-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pb-6">
               {article.imageUrl && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="w-2/5 sm:w-3/5 md:w-2/5 lg:w-1/3 float-right ml-4 sm:ml-5 md:ml-6 mb-2 sm:mb-4 md:mb-5">
@@ -222,7 +222,7 @@ const StackedCard = ({ article, index, onSave, isSaved, colorTheme, scrollProgre
             </motion.div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pt-3 sm:pt-4 border-t" style={{ borderColor: `${accentColor}10` }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="relative z-20 flex-shrink-0 p-5 sm:p-6 md:p-8 lg:p-10 pt-3 sm:pt-4 border-t pointer-events-auto" style={{ borderColor: `${accentColor}10` }}>
             <motion.a href={article.url} target="_blank" rel="noopener noreferrer" whileHover={{ x: 8, scale: 1.02 }} className="inline-flex items-center gap-2.5 text-sm sm:text-base font-bold group" style={{ color: accentColor }}>
               Read full article on Wikipedia
               <motion.div whileHover={{ x: 3, y: -3 }} transition={{ type: "spring", stiffness: 400 }}><ExternalLink className="w-4.5 h-4.5 sm:w-5 sm:h-5" /></motion.div>
